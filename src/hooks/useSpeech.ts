@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface UseSpeechReturn {
     isListening: boolean;
     isSpeaking: boolean;
+    isMuted: boolean; // New prop
     transcript: string;
     startListening: () => void;
     stopListening: () => void;
+    toggleMute: () => void; // New function
     speak: (text: string) => void;
     cancelSpeech: () => void;
     resetTranscript: () => void;
@@ -14,10 +16,24 @@ interface UseSpeechReturn {
 export function useSpeech(): UseSpeechReturn {
     const [isListening, setIsListening] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isMuted, setIsMuted] = useState(false); // Default: Not muted
     const [transcript, setTranscript] = useState('');
-
-    // Speech Recognition (STT)
     const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
+
+    const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+
+    useEffect(() => {
+        const updateVoices = () => {
+            voicesRef.current = window.speechSynthesis.getVoices();
+        };
+        
+        updateVoices();
+        window.speechSynthesis.onvoiceschanged = updateVoices;
+
+        return () => {
+            window.speechSynthesis.onvoiceschanged = null;
+        };
+    }, []);
 
     useEffect(() => {
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -32,22 +48,21 @@ export function useSpeech(): UseSpeechReturn {
 
             recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
                 let finalTranscript = '';
-                let interimTranscript = '';
-
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         finalTranscript += event.results[i][0].transcript;
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
                     }
                 }
-
                 if (finalTranscript) {
                     setTranscript(prev => prev + ' ' + finalTranscript);
                 }
             };
 
             setRecognition(recognitionInstance);
+
+            return () => {
+                recognitionInstance.stop();
+            };
         }
     }, []);
 
@@ -71,23 +86,40 @@ export function useSpeech(): UseSpeechReturn {
         setTranscript('');
     }, []);
 
-    // Text to Speech (TTS)
+    const toggleMute = useCallback(() => {
+        setIsMuted(prev => {
+            const newState = !prev;
+            // If we are muting, stop any current speech immediately
+            if (newState) {
+                window.speechSynthesis.cancel();
+                setIsSpeaking(false);
+            }
+            return newState;
+        });
+    }, []);
+
     const speak = useCallback((text: string) => {
+        // logic: If muted, do NOT speak.
+        if (isMuted) return;
+
         if ('speechSynthesis' in window) {
-            cancelSpeech();
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.onstart = () => setIsSpeaking(true);
             utterance.onend = () => setIsSpeaking(false);
             utterance.onerror = () => setIsSpeaking(false);
 
-            // Select a better voice if available
-            const voices = window.speechSynthesis.getVoices();
-            const preferredVoice = voices.find(voice => voice.name.includes('Google US English') || voice.name.includes('Samantha'));
+            const preferredVoice = voicesRef.current.find(voice => 
+                voice.name.includes('Google US English') || voice.name.includes('Samantha')
+            );
+            
             if (preferredVoice) utterance.voice = preferredVoice;
 
             window.speechSynthesis.speak(utterance);
         }
-    }, []);
+    }, [isMuted]); // Re-create function if mute state changes
 
     const cancelSpeech = useCallback(() => {
         if ('speechSynthesis' in window) {
@@ -99,9 +131,11 @@ export function useSpeech(): UseSpeechReturn {
     return {
         isListening,
         isSpeaking,
+        isMuted,
         transcript,
         startListening,
         stopListening,
+        toggleMute,
         speak,
         cancelSpeech,
         resetTranscript
