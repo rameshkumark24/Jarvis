@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, MicOff } from 'lucide-react';
+import { Send, Mic, MicOff, Volume2, VolumeX } from 'lucide-react'; // Added Volume icons
 import ReactMarkdown from 'react-markdown';
 import { VoiceVisualizer } from './VoiceVisualizer';
 import { useGemini } from '../hooks/useGemini';
@@ -17,6 +17,8 @@ export function ChatInterface() {
     const {
         isListening,
         transcript,
+        isMuted, // New
+        toggleMute, // New
         startListening,
         stopListening,
         speak,
@@ -42,7 +44,6 @@ export function ChatInterface() {
         scrollToBottom();
     }, [messages]);
 
-    // Sync transcript to input
     useEffect(() => {
         if (transcript) {
             setInput(transcript);
@@ -53,7 +54,6 @@ export function ChatInterface() {
         e.preventDefault();
         if (!input.trim() || isLoading) return;
 
-        // Stop listening if active
         if (isListening) stopListening();
 
         const userMessage = input;
@@ -121,6 +121,21 @@ export function ChatInterface() {
             {/* Input Area */}
             <div className="relative pb-4">
                 <form onSubmit={handleSubmit} className="relative flex items-center gap-4 bg-slate-800/40 backdrop-blur-xl p-2 rounded-full border border-white/10 focus-within:border-cyan-500/50 transition-colors">
+                    
+                    {/* Mute Toggle Button */}
+                    <button
+                        type="button"
+                        onClick={toggleMute}
+                        className={`p-3 rounded-full transition-all duration-300 ${isMuted
+                            ? 'bg-slate-700/50 text-slate-400'
+                            : 'bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20'
+                            }`}
+                        title={isMuted ? "Unmute Voice" : "Mute Voice"}
+                    >
+                        {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                    </button>
+
+                    {/* Microphone Button */}
                     <button
                         type="button"
                         onClick={toggleListening}
@@ -133,7 +148,7 @@ export function ChatInterface() {
                     </button>
 
                     {isListening && (
-                        <div className="absolute left-14 top-1/2 -translate-y-1/2">
+                        <div className="absolute left-28 top-1/2 -translate-y-1/2">
                             <VoiceVisualizer isListening={isListening} />
                         </div>
                     )}
@@ -143,7 +158,7 @@ export function ChatInterface() {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder={isListening ? "Listening..." : "Type or speak..."}
-                        className={`flex-1 bg-transparent border-none outline-none text-white placeholder-slate-400 px-2 ${isListening ? 'pl-16' : ''}`}
+                        className={`flex-1 bg-transparent border-none outline-none text-white placeholder-slate-400 px-2 ${isListening ? 'pl-24' : ''}`}
                     />
 
                     <button
