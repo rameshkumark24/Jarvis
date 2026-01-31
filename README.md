@@ -1,73 +1,65 @@
-# React + TypeScript + Vite
+# Jarvis - AI Voice Assistant 🤖
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, voice-activated AI assistant built with React, TypeScript, and the Google Gemini API. Jarvis features real-time speech recognition, text-to-speech synthesis, and a futuristic UI with voice visualization.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+* **🎙️ Voice Interaction:** Speak to Jarvis using your microphone with real-time speech-to-text.
+* **🗣️ Natural Responses:** Jarvis speaks back to you using browser-native text-to-speech.
+* **🧠 Powered by Gemini:** Utilizes Google's Gemini 2.0 Flash model for fast, intelligent responses.
+* **🔊 Visual Feedback:** Includes a dynamic voice visualizer that reacts when the system is listening.
+* **🔇 Mute Control:** Toggle voice output on/off with a dedicated mute button.
+* **⚡ Fast & Modern:** Built with Vite and Tailwind CSS for high performance and sleek design.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Frontend:** React 19, TypeScript, Vite
+* **Styling:** Tailwind CSS, Lucide React (Icons)
+* **AI Model:** Google Gemini API (`gemini-2.0-flash`)
+* **Speech:** Web Speech API (SpeechRecognition & SpeechSynthesis)
 
-## Expanding the ESLint configuration
+## 🚀 Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+* Node.js (v18 or higher)
+* A Google Gemini API Key (Get one [here](https://aistudio.google.com/))
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1.  **Clone the repository**
+    ```bash
+    git clone [https://github.com/your-username/jarvis.git](https://github.com/your-username/jarvis.git)
+    cd jarvis
+    ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+3.  **Set up Environment Variables**
+    * Create a `.env` file in the root directory.
+    * Add your API key:
+        ```env
+        VITE_GEMINI_API_KEY=your_actual_api_key_here
+        ```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+4.  **Run the development server**
+    ```bash
+    npm run dev
+    ```
+
+## 🌍 Deployment
+
+You can deploy this project easily on Vercel or Netlify.
+
+**Important:** When deploying, make sure to add your `VITE_GEMINI_API_KEY` in the deployment platform's **Environment Variables** settings. Do not commit your `.env` file to GitHub.
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to open issues or submit pull requests.
+
+---
+
+*Built with ❤️ by [Your Name]*
